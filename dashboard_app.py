@@ -159,17 +159,15 @@ def index():
                            active_events=active_events,
                            last_updated=updated_time.strftime('%Y-%m-%d %H:%M:%S') if updated_time else 'Never')
 
+# Start background updater immediately (works with Gunicorn)
+updater_thread = threading.Thread(target=data_updater, daemon=True)
+updater_thread.start()
+
+# Load initial data
+load_game_data()
+
 if __name__ == '__main__':
-    # Start background updater
-    updater_thread = threading.Thread(target=data_updater, daemon=True)
-    updater_thread.start()
-
-    # Load initial data
-    load_game_data()
-
     print("🎮 Game Dashboard Starting...")
 
-    # IMPORTANT: Railway dynamic port
     port = int(os.environ.get("PORT", 5000))
-
     app.run(host="0.0.0.0", port=port, debug=False)
